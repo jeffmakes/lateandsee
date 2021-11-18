@@ -51,14 +51,12 @@ class Downloader:
     def download(self):
         cp = run(["curl", self.target, "--output", "/dev/null", "--max-time", str(self.timeout), "--write-out", "%{time_total} %{speed_download}"], capture_output=True)
         ret = cp.returncode
-        print(ret)
         
         if (ret == 6):
             print("Host name not known")
 
         elif (ret == 0):
             response = cp.stdout.splitlines()[0].decode("utf-8")
-            print(response)
             dltime = response.split()[0]
             speed = response.split()[1]
 
@@ -83,13 +81,16 @@ class DownloadResult:
 
 #cp = run(["ping", "-c 3", "google.com"], capture_output=True)
 #print(cp)
-p = Pinger("google.com")
-d = Downloader()
-
 #p = Pinger("sdfdsafdsafafdsasdasss.com")
-if (__name == "main"):
-    print(p.ping())
-    print(d.download())
+if (__name__ == "__main__"):
+    ping = Pinger("google.com")
+    download = Downloader()
 
+    p = ping.ping()
+    d = download.download()
 
+    timestamp = time()
+    isotime = datetime.fromtimestamp(timestamp).replace(microsecond=0).isoformat()
+
+    print("{} {} {} {} {} s {:.3f} Mb/s {} {} {}".format(timestamp, isotime, p.pingtime, p.returncode, d.dltime, d.speed, d.returncode, p.host, d.target))
 
