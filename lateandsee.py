@@ -24,7 +24,8 @@ class Pinger:
         elif (ret == 0):
             response = cp.stdout.splitlines()[1].decode("utf-8")
             timestamp = float(response[response.index('[')+1:response.index(']')]) #extract timestamp from between []'s
-            pingtime = response.split("time=")[1]
+            pingtime = response.split("time=")[1].split()[0]
+            print(pingtime)
             return PingResult(self.host, timestamp, pingtime, ret)
         
         else:
@@ -92,5 +93,5 @@ if (__name__ == "__main__"):
     timestamp = time()
     isotime = datetime.fromtimestamp(timestamp).replace(microsecond=0).isoformat()
 
-    print("{} {} {} {} {} s {:.3f} Mb/s {} {} {}".format(timestamp, isotime, p.pingtime, p.returncode, d.dltime, d.speed, d.returncode, p.host, d.target))
+    print("{} {} {} ms {} {} s {:.3f} Mb/s {} {} {}".format(timestamp, isotime, p.pingtime, p.returncode, d.dltime, d.speed, d.returncode, p.host, d.target))
 
