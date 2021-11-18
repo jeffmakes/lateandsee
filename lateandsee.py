@@ -41,7 +41,7 @@ class PingResult:
         self.isotime = datetime.fromtimestamp(timestamp).replace(microsecond=0).isoformat()
 
     def __str__(self):
-        return "{} {} {} ms {} {}".format(self.timestamp, self.isotime, self.pingtime, self.returncode, self.host)
+        return "{:.3f} {} {} ms {} {}".format(self.timestamp, self.isotime, self.pingtime, self.returncode, self.host)
 
 class Downloader:
 
@@ -92,7 +92,7 @@ class Tester():
         timestamp = time()
         isotime = datetime.fromtimestamp(timestamp).replace(microsecond=0).isoformat()
 
-        result = "{} {} {} ms {} {} s {:.3f} Mb/s {} {} {}".format(timestamp, isotime, p.pingtime, p.returncode, d.dltime, d.speed, d.returncode, p.host, d.target)
+        result = "{:.3f} {} {} ms {} {} s {:.3f} Mb/s {} {} {}".format(timestamp, isotime, p.pingtime, p.returncode, d.dltime, d.speed, d.returncode, p.host, d.target)
         return result 
 
 
