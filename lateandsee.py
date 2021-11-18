@@ -87,9 +87,9 @@ p = Pinger("google.com")
 d = Downloader()
 
 #p = Pinger("sdfdsafdsafafdsasdasss.com")
-
-print(p.ping())
-print(d.download())
+if (__name == "main"):
+    print(p.ping())
+    print(d.download())
 
 
 
