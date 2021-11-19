@@ -1,6 +1,6 @@
 #!/bin/python3
 import matplotlib.pyplot as plt
-import matplotlib.dates 
+from matplotlib.dates import AutoDateLocator, DateFormatter
 from datetime import datetime
 
 if (__name__ == "__main__"):
@@ -13,16 +13,20 @@ if (__name__ == "__main__"):
     for l in data:
         d = l.split()
         timestamp = float(d[0])
-        xvalues.append(datetime.fromtimestamp(timestamp).replace(microsecond=0))
+        xvalues.append(datetime.fromtimestamp(timestamp))
         pingtimes.append(float(d[2]))
 
-    #dates = matplotlib.dates.date2num(xvalues)
-    print(xvalues) 
-    #fig, ax = plt.subplots()  # Create a figure containing a single axes.
-    #ax.scatter(timestamps, pingtimes)  # Plot some data on the axes.
-    plt.plot(xvalues, pingtimes)
-    plt.gcf().autofmt_xdate()
-    #ax.set(xlim=(1637269330, 1637275009), ylim=(8.0, 10.0))
+    fig, ax = plt.subplots()  # Create a figure containing a single axes.
+    ax.scatter(xvalues, pingtimes)  # Plot some data on the axes.
+    #plt.gcf().autofmt_xdate()
+    labels = ax.get_xticklabels()
+    plt.setp(labels, rotation=45)
+    locator = AutoDateLocator()
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_formatter(DateFormatter("%Y-%m-%d %H:%M:%S"))
+    #ax.xaxis.set_major_formatter(AutoDateFormatter(locator))
+    fig.autofmt_xdate()
+    ax.set(ylim=(5, 40))
     plt.show()
     fig.savefig("out.png", transparent=False, dpi=80)
 
