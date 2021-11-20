@@ -7,7 +7,7 @@ target = "http://ipv4.download.thinkbroadband.com/10MB.zip"
 
 start = datetime.today() 
 delta = timedelta(minutes=5)
-duration = timedelta(hours=2) 
+duration = timedelta(hours=24) 
 end = start + duration
 t = start
 
@@ -24,6 +24,6 @@ while True:
     print(result)
     
     t = t + delta
-    if t > end:
+    if t >= end:
         break
 
