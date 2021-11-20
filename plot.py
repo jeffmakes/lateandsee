@@ -1,6 +1,5 @@
 #!/bin/python3
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import figure
 from matplotlib.dates import AutoDateLocator, DateFormatter, HourLocator
 from datetime import datetime
 
@@ -22,9 +21,9 @@ if (__name__ == "__main__"):
         dltimes.append(float(d[5]))
         dlspeeds.append(float(d[7]))
 
-    fig, ax = plt.subplots(3, 1, sharex=True)  # Create a figure containing a single axes.
+    fig, ax = plt.subplots(3, 1, sharex=True)
     
-    ax[0].plot(xvalues, pingtimes, color="#57d5ff")  # Plot some data on the axes.
+    ax[0].plot(xvalues, pingtimes, color="#57d5ff")  
     locator = HourLocator(interval=3)
     ax[0].xaxis.set_major_locator(locator)
     ax[0].xaxis.set_major_formatter(DateFormatter("%Y-%m-%d %H:%M:%S"))
@@ -36,7 +35,7 @@ if (__name__ == "__main__"):
     labels = ax[2].get_xticklabels()
     plt.setp(labels, rotation=45, horizontalalignment='right')
     
-    ax[1].plot(xvalues, dltimes, "#ffa136")  # Plot some data on the axes.
+    ax[1].plot(xvalues, dltimes, "#ffa136")  
     ax[1].set_ylabel("Download time s")
     ax[1].set(ylim=(0, 40))
 
@@ -45,7 +44,6 @@ if (__name__ == "__main__"):
     ax[2].set(ylim=(0, 5))
     
 #    plt.show()
-    #figure(num=1, figsize = (10, 30), dpi = 100) 
     size_px = (1600, 1000)
     dpi = 100 
     fig.set_dpi(dpi)
