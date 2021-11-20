@@ -20,18 +20,18 @@ if (__name__ == "__main__"):
         dltimes.append(float(d[5]))
         speeds.append(float(d[7]))
 
-    fig, ax = plt.subplots(2, 1, sharex=False)  # Create a figure containing a single axes.
+    fig, ax = plt.subplots(2, 1, sharex=True)  # Create a figure containing a single axes.
     ax[0].plot(xvalues, pingtimes)  # Plot some data on the axes.
     #locator = AutoDateLocator()
     locator = HourLocator(interval=3)
-    ax[0].xaxis.set_major_locator(locator)
-    ax[0].xaxis.set_major_formatter(DateFormatter("%Y-%m-%d %H:%M:%S"))
+    ax[1].xaxis.set_major_locator(locator)
+    ax[1].xaxis.set_major_formatter(DateFormatter("%Y-%m-%d %H:%M:%S"))
     locator = HourLocator(interval=1) 
-    ax[0].xaxis.set_minor_locator(locator)
+    ax[1].xaxis.set_minor_locator(locator)
     
     ax[0].set_ylabel("Ping time ms")
-    ax[0].set(ylim=(5, 40))
-    labels = ax[0].get_xticklabels()
+    ax[0].set(ylim=(5, 100))
+    labels = ax[1].get_xticklabels()
     plt.setp(labels, rotation=45, horizontalalignment='right')
     
     ax[1].plot(xvalues, dltimes)  # Plot some data on the axes.
