@@ -32,18 +32,20 @@ class LateAndSee:
             self.outfile.close()
 
     def take_measurement(self):
-        result = self.m.measure() 
-        self.data.append(result)
+        result = str(self.m.measure())
 
-        if len(self.data) > self.data_len:
-            self.data.pop(0)
+        if (result):        # if there is an error, eg. no network, result will be zero-length
+            self.data.append(result)
 
-        if (self.outfile):
-            self.outfile.write(result+'\n')
-            self.outfile.flush()
+            if len(self.data) > self.data_len:
+                self.data.pop(0)
 
-        if (self.plotter):
-            self.plotter.plot(self.data)
+            if (self.outfile):
+                self.outfile.write(result+'\n')
+                self.outfile.flush()
+
+            if (self.plotter):
+                self.plotter.plot(self.data)
 
         self.print_data()
 
