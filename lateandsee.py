@@ -2,6 +2,7 @@
 from measure import Measure
 import threading, time
 from datetime import datetime, timedelta
+from time import sleep
 from plot import Plot
 
 class LateAndSee:
@@ -44,9 +45,6 @@ class LateAndSee:
                 self.outfile.write(result+'\n')
                 self.outfile.flush()
 
-            if (self.plotter):
-                self.plotter.plot(self.data)
-
         self.print_data()
 
 
@@ -55,11 +53,18 @@ class LateAndSee:
         self.take_measurement()
 
         self.next_call = self.next_call + self.interval
-        threading.Timer(self.next_call - time.time(), self.measurement_timer).start()
+        self.timer = threading.Timer(self.next_call - time.time(), self.measurement_timer).start()
 
     def print_data(self):
         for d in self.data:
             print(d)
+
+    def get_data(self):
+        return self.data
+
+    def plot_data(self):
+        if (self.plotter):
+            self.plotter.plot(self.data)
         
 if (__name__ == "__main__"):
     l = LateAndSee(load_from_filename="data.csv", write_to_filename="data.csv", plot_filename="out.png")
@@ -70,7 +75,10 @@ if (__name__ == "__main__"):
 
     l.measurement_timer()
 
-
+    while True:
+        print("bees")
+        sleep(10)
+        l.plot_data()
 #    with open("data.csv", "a") as f:
 #        f.write(m.perform_test() + "\n")
 
