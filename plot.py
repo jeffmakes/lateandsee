@@ -2,7 +2,8 @@
 import matplotlib.pyplot as plt
 from matplotlib.dates import AutoDateLocator, DateFormatter, HourLocator
 from datetime import datetime
-
+import matplotlib
+matplotlib.use("Agg")
     
 class Plot:
 

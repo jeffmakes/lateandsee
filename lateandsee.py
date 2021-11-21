@@ -9,7 +9,7 @@ class LateAndSee:
     def __init__(self, interval=5, data_len=10, load_from_filename=None, write_to_filename=None, plot_filename=None):
         self.next_call = time.time()
         self.interval = interval        # interval between measurements in seconds
-        self.data_len = data_len       # number of measurements to store in buffer for live plotting
+        self.data_len = int(24 * 60 * (60/interval))   # number of measurements to store in buffer for live plotting
         self.data = []
         self.m = Measure()
         self.outfile = None
@@ -76,7 +76,6 @@ if (__name__ == "__main__"):
     l.measurement_timer()
 
     while True:
-        print("bees")
         sleep(10)
         l.plot_data()
 #    with open("data.csv", "a") as f:
