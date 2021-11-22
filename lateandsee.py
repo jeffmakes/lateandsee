@@ -1,4 +1,3 @@
-#!/bin/python3
 from measure import Measure
 from serve import Serve
 import threading, time
@@ -90,7 +89,7 @@ if (__name__ == "__main__"):
     except KeyboardInterrupt:
         l.__exit__()
         s.stop()
-        print("Bye")
+        print("\nBye")
 
         try:
             sys.exit(1)
