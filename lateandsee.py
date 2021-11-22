@@ -45,7 +45,7 @@ class LateAndSee:
                 self.outfile.write(result+'\n')
                 self.outfile.flush()
 
-        self.print_data()
+        #self.print_data()
 
 
     def measurement_timer(self):
@@ -65,9 +65,12 @@ class LateAndSee:
     def plot_data(self):
         if (self.plotter):
             self.plotter.plot(self.data)
+
+    def get_interval(self):
+        return self.interval
         
 if (__name__ == "__main__"):
-    l = LateAndSee(load_from_filename="data.csv", write_to_filename="data.csv", plot_filename="out.png")
+    l = LateAndSee(interval = 60, load_from_filename="data.csv", write_to_filename="data.csv", plot_filename="out.png")
     #start = datetime.today() 
     #plot_interval = timedelta(minutes=5)
     #plot_duration = timedelta(hours=24) 
@@ -76,7 +79,7 @@ if (__name__ == "__main__"):
     l.measurement_timer()
 
     while True:
-        sleep(10)
+        sleep(l.get_interval())
         l.plot_data()
 #    with open("data.csv", "a") as f:
 #        f.write(m.perform_test() + "\n")
