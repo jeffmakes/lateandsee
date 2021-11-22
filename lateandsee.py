@@ -1,106 +1,97 @@
 #!/bin/python3
+from measure import Measure
+from serve import Serve
+import threading, time
+from datetime import datetime, timedelta
+from time import sleep
+from plot import Plot
 
-from subprocess import run
-from datetime import datetime
-from time import time
-from os import path
+class LateAndSee:
+    def __init__(self, interval=5, plot_duration=24*60*60, load_from_filename=None, write_to_filename=None, plot_filename=None):
+        self.next_call = time.time()
+        self.interval = interval        # interval between measurements in seconds
+        self.data_len = int(24 * 60 * (60/interval))   # number of measurements to store in buffer for live plotting
+        self.data = []
+        self.m = Measure()
+        self.outfile = None
+        self.plotter = None
 
-class Pinger:
+        if (load_from_filename):
+            with open(load_from_filename, "r") as f:
+                timestamps = []
+                fdata = f.read().splitlines()
+                
+                for l in fdata:
+                    timestamps.append(float(l.split()[0]))
+                begin_idx = next(i for i,v in enumerate(timestamps) if v > (time.time()-plot_duration) )    #find index of first timestamp after plot_duration seconds ago
+                print(timestamps[begin_idx])
+                self.data = fdata[begin_idx:]
+                print(self.data)
+                f.close()
 
-    def __init__(self, host="google.com"):
-        self.host = host
+        if (write_to_filename):
+            self.outfile = open(write_to_filename, "a")
 
-    def ping(self):
-        cp = run(["ping", "-c 1", "-D", self.host], capture_output=True)
-        ret = cp.returncode
+        if (plot_filename):
+            self.plotter = Plot(plot_filename)
 
-        if (ret == 1):
-            print("Timeout")
-            return PingResult(None, None, None, ret)
+    def __exit__(self):
+        if not self.outfile.closed:
+            self.outfile.flush()
+            self.outfile.close()
+
+    def take_measurement(self):
+        result = str(self.m.measure())
+
+        if (result):        # if there is an error, eg. no network, result will be zero-length
+            self.data.append(result)
+
+            if len(self.data) > self.data_len:
+                self.data.pop(0)
+
+            if (self.outfile):
+                self.outfile.write(result+'\n')
+                self.outfile.flush()
+
+        #self.print_data()
+
+
+    def measurement_timer(self):
+        print (datetime.now())
+        self.take_measurement()
+
+        self.next_call = self.next_call + self.interval
+        self.timer = threading.Timer(self.next_call - time.time(), self.measurement_timer).start()
+
+    def print_data(self):
+        for d in self.data:
+            print(d)
+
+    def get_data(self):
+        return self.data
+
+    def plot_data(self):
+        if (self.plotter):
+            self.plotter.plot(self.data)
+
+    def get_interval(self):
+        return self.interval
         
-        elif (ret == 2):
-            print("Host name not known")
-            return PingResult(None, None, None, ret)
-            
-        elif (ret == 0):
-            response = cp.stdout.splitlines()[1].decode("utf-8")
-            timestamp = float(response[response.index('[')+1:response.index(']')]) #extract timestamp from between []'s
-            pingtime = response.split("time=")[1].split()[0]
-            return PingResult(self.host, timestamp, pingtime, ret)
-        
-        else:
-            print("Unknown error")
-
-class PingResult:
-     
-    def __init__(self, host, timestamp, pingtime, returncode):
-        self.host = host
-        self.timestamp = timestamp
-        self.pingtime = pingtime
-        self.returncode = returncode
-        self.isotime = datetime.fromtimestamp(timestamp).replace(microsecond=0).isoformat()
-
-    def __str__(self):
-        return "{:.3f} {} {} ms {} {}".format(self.timestamp, self.isotime, self.pingtime, self.returncode, self.host)
-
-class Downloader:
-
-    def __init__(self, target="http://ipv4.download.thinkbroadband.com/10MB.zip", timeout=30):      # https://www.thinkbroadband.com/download
-        self.target = target
-        self.timeout = timeout
-
-    def download(self):
-        cp = run(["curl", self.target, "--output", "/dev/null", "--max-time", str(self.timeout), "--write-out", "%{time_total} %{speed_download}"], capture_output=True)
-        ret = cp.returncode
-        
-        if (ret == 6):
-            print("Host name not known")
-
-        elif (ret == 0):
-            response = cp.stdout.splitlines()[0].decode("utf-8")
-            dltime = response.split()[0]
-            speed = response.split()[1]
-
-        else:
-            print("Unknown error")
-
-        return DownloadResult(self.target, time(), dltime, speed, ret)
-
-
-class DownloadResult:
-    
-    def __init__(self, target, timestamp, dltime, speed, returncode):
-        self.target = target
-        self.timestamp = timestamp
-        self.dltime = dltime
-        self.speed = float(speed)/(1024*1024)
-        self.returncode = returncode
-        self.isotime = datetime.fromtimestamp(timestamp).replace(microsecond=0).isoformat()
-
-    def __str__(self):
-        return "{} {} {} s {:.3f} Mb/s {} {}".format(self.timestamp, self.isotime, self.dltime, self.speed, self.returncode, self.target)
-
-class Tester():
-
-    def __init__(self):
-        self.pinger = Pinger()
-        self.downloader = Downloader()
-
-    def perform_test(self):
-        p = self.pinger.ping()
-        d = self.downloader.download()
-        timestamp = time()
-        isotime = datetime.fromtimestamp(timestamp).replace(microsecond=0).isoformat()
-
-        result = "{:.3f} {} {} ms {} {} s {:.3f} Mb/s {} {} {}".format(timestamp, isotime, p.pingtime, p.returncode, d.dltime, d.speed, d.returncode, p.host, d.target)
-        return result 
-
-
 if (__name__ == "__main__"):
-    t = Tester()
+    l = LateAndSee(interval = 60, load_from_filename="data.csv", write_to_filename="data.csv", plot_filename="out.png")
+    s=  Serve()
+    #start = datetime.today() 
+    #plot_interval = timedelta(minutes=5)
+    #plot_duration = timedelta(hours=24) 
+    #t = start
+    print("Beginning measurement")
 
-    with open("data.csv", "a") as f:
-        f.write(t.perform_test() + "\n")
+    l.measurement_timer()
+    while True:
+        sleep(l.get_interval())
+        l.plot_data()
+#    with open("data.csv", "a") as f:
+#        f.write(m.perform_test() + "\n")
 
-    f.close()
+#f.close()
 
