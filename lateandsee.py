@@ -5,6 +5,8 @@ import threading, time
 from datetime import datetime, timedelta
 from time import sleep
 from plot import Plot
+import sys, os
+
 
 class LateAndSee:
     def __init__(self, interval=5, plot_duration=24*60*60, load_from_filename=None, write_to_filename=None, plot_filename=None):
@@ -24,9 +26,8 @@ class LateAndSee:
                 for l in fdata:
                     timestamps.append(float(l.split()[0]))
                 begin_idx = next(i for i,v in enumerate(timestamps) if v > (time.time()-plot_duration) )    #find index of first timestamp after plot_duration seconds ago
-                print(timestamps[begin_idx])
+                print("Plotting from timestamp {}".format(timestamps[begin_idx]))
                 self.data = fdata[begin_idx:]
-                print(self.data)
                 f.close()
 
         if (write_to_filename):
@@ -53,9 +54,6 @@ class LateAndSee:
                 self.outfile.write(result+'\n')
                 self.outfile.flush()
 
-        #self.print_data()
-
-
     def measurement_timer(self):
         print (datetime.now())
         self.take_measurement()
@@ -76,22 +74,26 @@ class LateAndSee:
 
     def get_interval(self):
         return self.interval
-        
+    
+
 if (__name__ == "__main__"):
-    l = LateAndSee(interval = 60, load_from_filename="data.csv", write_to_filename="data.csv", plot_filename="out.png")
-    s=  Serve()
-    #start = datetime.today() 
-    #plot_interval = timedelta(minutes=5)
-    #plot_duration = timedelta(hours=24) 
-    #t = start
-    print("Beginning measurement")
+    try:
+        l = LateAndSee(interval = 60, load_from_filename="data.csv", write_to_filename="data.csv", plot_filename="out.png")
+        s =  Serve()
+        print("Beginning measurement")
 
-    l.measurement_timer()
-    while True:
-        sleep(l.get_interval())
-        l.plot_data()
-#    with open("data.csv", "a") as f:
-#        f.write(m.perform_test() + "\n")
+        l.measurement_timer()
+        while True:
+            sleep(l.get_interval())
+            l.plot_data()
 
-#f.close()
+    except KeyboardInterrupt:
+        l.__exit__()
+        s.stop()
+        print("Bye")
+
+        try:
+            sys.exit(1)
+        except SystemExit:
+            os._exit(1)
 

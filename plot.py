@@ -54,7 +54,7 @@ class Plot:
         fig.set_dpi(dpi)
         fig.set_size_inches(size_px[0]/dpi, size_px[1]/dpi)
         plt.subplots_adjust(top=0.9, bottom=0.2)
-        print(self.output_filename)
+        print("Writing plot to {}".format(self.output_filename))
         fig.savefig(self.output_filename, transparent=False)
 
 

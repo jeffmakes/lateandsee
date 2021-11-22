@@ -10,11 +10,15 @@ class Serve:
 
         Handler = http.server.SimpleHTTPRequestHandler
 
-        httpd = ThreadedTCPServer(("", port), Handler)
-        print("serving at port", port)
+        self.httpd = ThreadedTCPServer(("", port), Handler)
+        print("Serving at port", port)
 
-        server_thread = threading.Thread(target=httpd.serve_forever)
+        self.server_thread = threading.Thread(target=self.httpd.serve_forever)
         # Exit the server thread when the main thread terminates
-        server_thread.daemon = True
-        server_thread.start()
+        self.server_thread.daemon = True
+        self.server_thread.start()
+
+    def stop(self):
+        self.httpd.shutdown()
+
 
