@@ -1,12 +1,13 @@
 #!/bin/python3
 from measure import Measure
+from serve import Serve
 import threading, time
 from datetime import datetime, timedelta
 from time import sleep
 from plot import Plot
 
 class LateAndSee:
-    def __init__(self, interval=5, data_len=10, load_from_filename=None, write_to_filename=None, plot_filename=None):
+    def __init__(self, interval=5, plot_duration=24*60*60, load_from_filename=None, write_to_filename=None, plot_filename=None):
         self.next_call = time.time()
         self.interval = interval        # interval between measurements in seconds
         self.data_len = int(24 * 60 * (60/interval))   # number of measurements to store in buffer for live plotting
@@ -17,8 +18,15 @@ class LateAndSee:
 
         if (load_from_filename):
             with open(load_from_filename, "r") as f:
+                timestamps = []
                 fdata = f.read().splitlines()
-                self.data = fdata[(-1*self.data_len):]
+                
+                for l in fdata:
+                    timestamps.append(float(l.split()[0]))
+                begin_idx = next(i for i,v in enumerate(timestamps) if v > (time.time()-plot_duration) )    #find index of first timestamp after plot_duration seconds ago
+                print(timestamps[begin_idx])
+                self.data = fdata[begin_idx:]
+                print(self.data)
                 f.close()
 
         if (write_to_filename):
@@ -71,13 +79,14 @@ class LateAndSee:
         
 if (__name__ == "__main__"):
     l = LateAndSee(interval = 60, load_from_filename="data.csv", write_to_filename="data.csv", plot_filename="out.png")
+    s=  Serve()
     #start = datetime.today() 
     #plot_interval = timedelta(minutes=5)
     #plot_duration = timedelta(hours=24) 
     #t = start
+    print("Beginning measurement")
 
     l.measurement_timer()
-
     while True:
         sleep(l.get_interval())
         l.plot_data()
