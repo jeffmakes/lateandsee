@@ -56,7 +56,7 @@ class Plot:
         plt.subplots_adjust(top=0.9, bottom=0.2)
         print("Writing plot to {}".format(self.output_filename))
         fig.savefig(self.output_filename, transparent=False)
-
+        plt.close(fig) 
 
 if (__name__ == "__main__"):
     with open("data.csv", "r") as f:
