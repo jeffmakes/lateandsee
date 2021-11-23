@@ -24,7 +24,12 @@ class LateAndSee:
                 
                 for l in fdata:
                     timestamps.append(float(l.split()[0]))
-                begin_idx = next(i for i,v in enumerate(timestamps) if v > (time.time()-plot_duration) )    #find index of first timestamp after plot_duration seconds ago
+
+                try:
+                    begin_idx = next(i for i,v in enumerate(timestamps) if v > (time.time()-plot_duration) )    #find index of first timestamp after plot_duration seconds ago
+                except StopIteration:
+                    begin_idx = len(timestamps)-1
+
                 print("Plotting from timestamp {}".format(timestamps[begin_idx]))
                 self.data = fdata[begin_idx:]
                 f.close()
@@ -41,7 +46,7 @@ class LateAndSee:
             self.outfile.close()
 
     def take_measurement(self):
-        result = str(self.m.measure())
+        result = self.m.measure()
 
         if (result):        # if there is an error, eg. no network, result will be zero-length
             self.data.append(result)
